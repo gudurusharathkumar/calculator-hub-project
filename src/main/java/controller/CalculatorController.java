@@ -1,14 +1,9 @@
 package com.example.calculatorhub.controller;
 
-import com.example.calculatorhub.entity.CalculationHistory;
-import com.example.calculatorhub.repository.CalculationRepository;
 import com.example.calculatorhub.service.CalculatorService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -16,177 +11,95 @@ import java.util.Map;
 @CrossOrigin
 public class CalculatorController {
 
-    @Autowired
-    private CalculatorService service;
+    private final CalculatorService service;
 
-    @Autowired
-    private CalculationRepository repo;
-
-    //  HOME
-    @GetMapping("/")
-    public String home() {
-        return "Calculator Hub Backend Running";
+    public CalculatorController(CalculatorService service) {
+        this.service = service;
     }
 
-    // ================= FINANCE =================
+    private Map<String, Object> response(Object value) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("result", value);
+        return map;
+    }
+
+    @GetMapping("/emi")
+    public Map<String, Object> emi(double principal, double rate, int time) {
+        return response(service.emi(principal, rate, time));
+    }
 
     @GetMapping("/gst")
-    public Map<String, Double> gst(@RequestParam double amount, @RequestParam double rate) {
-        Map<String, Double> res = new HashMap<>();
-        res.put("gst", service.gst(amount, rate));
-        save("GST", amount, rate, res.get("gst"));
-        return res;
+    public Map<String, Object> gst(double amount, double rate) {
+        return response(service.gst(amount, rate));
     }
 
     @GetMapping("/roi")
-    public Map<String, Double> roi(@RequestParam double gain, @RequestParam double investment) {
-        Map<String, Double> res = new HashMap<>();
-        res.put("roi", service.roi(gain, investment));
-        save("ROI", gain, investment, res.get("roi"));
-        return res;
+    public Map<String, Object> roi(double gain, double investment) {
+        return response(service.roi(gain, investment));
     }
 
     @GetMapping("/interest")
-    public Map<String, Double> interest(@RequestParam double p,
-                                        @RequestParam double r,
-                                        @RequestParam double t) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("interest", service.interest(p, r, t));
-        save("INTEREST", p, r, res.get("interest"));
-        return res;
+    public Map<String, Object> interest(double p, double r, double t) {
+        return response(service.interest(p, r, t));
     }
 
     @GetMapping("/break-even")
-    public Map<String, Double> breakEven(@RequestParam double fixedCost,
-                                         @RequestParam double price,
-                                         @RequestParam double variableCost) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("breakEven", service.breakEven(fixedCost, price, variableCost));
-        save("BREAK_EVEN", fixedCost, price, res.get("breakEven"));
-        return res;
-    }
-
-    // ================= PERSONAL =================
-
-    @GetMapping("/date-diff")
-    public Map<String, Long> dateDiff(@RequestParam String start,
-                                      @RequestParam String end) {
-
-        Map<String, Long> res = new HashMap<>();
-        res.put("days", service.dateDiff(start, end));
-        return res;
+    public Map<String, Object> breakEven(double fixedCost, double pricePerUnit, double variableCost) {
+        return response(service.breakEven(fixedCost, pricePerUnit, variableCost));
     }
 
     @GetMapping("/time-duration")
-    public Map<String, Long> timeDuration(@RequestParam String start,
-                                          @RequestParam String end) {
-
-        Map<String, Long> res = new HashMap<>();
-        res.put("minutes", service.timeDuration(start, end));
-        return res;
+    public Map<String, Object> timeDuration(String start, String end) {
+        return response(service.timeDuration(start, end));
     }
 
-    // ================= HEALTH =================
+    @GetMapping("/date-diff")
+    public Map<String, Object> dateDiff(String start, String end) {
+        return response(service.dateDiff(start, end));
+    }
 
     @GetMapping("/bmi")
-    public Map<String, Double> bmi(@RequestParam double weight,
-                                   @RequestParam double height) {
+    public Map<String, Object> bmi(double weight, double height) {
+        return response(service.bmi(weight, height));
+    }
 
-        Map<String, Double> res = new HashMap<>();
-        res.put("bmi", service.bmi(weight, height));
-        save("BMI", weight, height, res.get("bmi"));
-        return res;
+    @GetMapping("/percentage")
+    public Map<String, Object> percentage(double obtained, double total) {
+        return response(service.percentage(obtained, total));
+    }
+
+    @GetMapping("/age")
+    public Map<String, Object> age(int birthYear) {
+        return response(service.age(birthYear));
     }
 
     @GetMapping("/calories")
-    public Map<String, Double> calories(@RequestParam double weight) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("calories", service.calories(weight));
-        save("CALORIES", weight, 0, res.get("calories"));
-        return res;
+    public Map<String, Object> calories(double weight) {
+        return response(service.calories(weight));
     }
 
     @GetMapping("/water")
-    public Map<String, Double> water(@RequestParam double weight) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("water", service.water(weight));
-        save("WATER", weight, 0, res.get("water"));
-        return res;
+    public Map<String, Object> water(double weight) {
+        return response(service.water(weight));
     }
 
-    // ================= BUSINESS =================
+    @GetMapping("/pregnancy")
+    public Map<String, Object> pregnancy(String lastPeriod) {
+        return response(service.pregnancy(lastPeriod));
+    }
+    @GetMapping("/startup")
+    public Map<String, Object> startup(double revenue, double multiplier) {
+        return response(service.startup(revenue, multiplier));
+    }
+
 
     @GetMapping("/profit")
-    public Map<String, Double> profit(@RequestParam double revenue,
-                                      @RequestParam double cost) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("profitMargin", service.profit(revenue, cost));
-        save("PROFIT", revenue, cost, res.get("profitMargin"));
-        return res;
-    }
-
-    @GetMapping("/startup")
-    public Map<String, Double> startup(@RequestParam double revenue,
-                                       @RequestParam double multiplier) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("valuation", service.startup(revenue, multiplier));
-        save("STARTUP", revenue, multiplier, res.get("valuation"));
-        return res;
+    public Map<String, Object> profit(double cost, double revenue) {
+        return response(service.profit(cost, revenue));
     }
 
     @GetMapping("/cost")
-    public Map<String, Double> cost(@RequestParam double fixedCost,
-                                    @RequestParam double variableCost,
-                                    @RequestParam double units) {
-
-        Map<String, Double> res = new HashMap<>();
-        res.put("totalCost", service.cost(fixedCost, variableCost, units));
-        save("COST", fixedCost, variableCost, res.get("totalCost"));
-        return res;
-    }
-
-    // ================= HISTORY =================
-
-    @GetMapping("/history")
-    public List<CalculationHistory> getAll() {
-        return repo.findAll();
-    }
-
-    //  FILTER
-    @GetMapping("/history/filter")
-    public List<CalculationHistory> filter(@RequestParam String type) {
-        return repo.findByType(type);
-    }
-
-    //  DASHBOARD
-    @GetMapping("/dashboard")
-    public Map<String, Object> dashboard() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("totalCalculations", repo.count());
-        return data;
-    }
-
-    //  DELETE
-    @DeleteMapping("/history/{id}")
-    public String delete(@PathVariable int id) {
-        repo.deleteById(id);
-        return "Deleted Successfully";
-    }
-
-    // ================= SAVE METHOD =================
-
-    private void save(String type, double input1, double input2, double result) {
-        CalculationHistory h = new CalculationHistory();
-        h.setType(type);
-        h.setInput1(input1);
-        h.setInput2(input2);
-        h.setResult(result);
-        repo.save(h);
+    public Map<String, Object> cost(double fixedCost, double variableCost, int units) {
+        return response(service.cost(fixedCost, variableCost, units));
     }
 }
