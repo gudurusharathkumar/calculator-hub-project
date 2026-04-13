@@ -1,15 +1,18 @@
-FROM gradle:8.5-jdk17 AS build
+# Use Java 17
+FROM openjdk:17-jdk-slim
 
+# Set working directory
 WORKDIR /app
+
+# Copy project files
 COPY . .
 
-RUN chmod +x gradlew && ./gradlew build -x test
+# Build project (Gradle)
+RUN chmod +x gradlew
+RUN ./gradlew build -x test
 
-FROM eclipse-temurin:17-jdk
-
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
-
+# Expose port
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run jar (auto detect)
+CMD ["sh", "-c", "java -jar build/libs/*.jar"]
