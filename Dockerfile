@@ -1,18 +1,18 @@
-# Use Java 17
-FROM openjdk:17-jdk-slim
+#  Correct stable Java image
+FROM eclipse-temurin:17-jdk
 
-# Set working directory
+# Working directory
 WORKDIR /app
 
-# Copy project files
+# Copy project
 COPY . .
 
-# Build project (Gradle)
+# Build using Gradle
 RUN chmod +x gradlew
-RUN ./gradlew build -x test
+RUN ./gradlew clean build -x test
 
 # Expose port
 EXPOSE 8080
 
-# Run jar (auto detect)
-CMD ["sh", "-c", "java -jar build/libs/*.jar"]
+# Run jar
+CMD ["java", "-jar", "build/libs/calculatorhub-0.0.1-SNAPSHOT.jar"]
